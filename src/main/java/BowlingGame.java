@@ -47,12 +47,18 @@ public class BowlingGame {
     }
 
     /**
-     * 该格没有Spare和Stike，计算两次之和
+     * 计算一格的和
      *
      * @param bucket
      * @return
      */
     private int normalBucket(String bucket) {
+
+        //如果第二次Spare，那么的和为10
+        if (bucket.charAt(1) == '/')
+            return 10;
+
+        //否则计算两次
         int num = 0;
         char c = bucket.charAt(0);
         if (c == '-') {
@@ -78,7 +84,14 @@ public class BowlingGame {
      */
     private int normalSpare(String next) {
         int num = 10;
-        num += afterStrikeOrSpare(next);
+        char c = next.charAt(0);
+        if (c == 'X') {
+            num += 10;
+        } else if (c == '-') {
+            num += 0;
+        } else {
+            num += (c - '0');
+        }
         return num;
     }
 
@@ -113,8 +126,22 @@ public class BowlingGame {
      */
     private int normalStrike(String s, String s1) {
         int num = 10;
-        num += afterStrikeOrSpare(s);
-        num += afterStrikeOrSpare(s1);
+        //如果下一格只扔了一次，即X，那么还需要考虑下下格
+        if (s.length() == 1) {
+            num += 10;
+            char c = s1.charAt(0);
+            if (c == 'X') {
+                num += 10;
+            } else if (c == '-') {
+                num += 0;
+            } else {
+                num += (c - '0');
+            }
+        }
+        //下一格扔了两次
+        else {
+            num += normalBucket(s);
+        }
         return num;
     }
 
@@ -124,10 +151,26 @@ public class BowlingGame {
      *
      * @return
      */
-    private int eightStike(String s1, String s2) {
+    private int eightStike(String next1, String next2) {
         int num = 10;
-        num += afterStrikeOrSpare(s1);
-        num += afterStrikeOrSpare(s2);
+        //后一格为X
+        if (next1.length() == 1) {
+            num += 10;
+            char c = next2.charAt(0);
+            if (c == 'X') {
+                num += 10;
+            } else if (c == '-') {
+                num += 0;
+            } else {
+                num += (c - '0');
+            }
+
+
+        }
+        //没有额外机会，next1扔了两次
+        else {
+            num += normalBucket(next1);
+        }
         return num;
     }
 
@@ -162,30 +205,5 @@ public class BowlingGame {
         return num;
 
     }
-
-    /**
-     * 计算Strike后的桶的分数
-     *
-     * @param bucket
-     * @return
-     */
-    private int afterStrikeOrSpare(String bucket) {
-        if (bucket.length() == 0)
-            return 0;
-        int num = 0;
-        char c = bucket.charAt(0);
-        if (c == 'X') {
-            num += 10;
-        }
-        //miss
-        else if (c == '-') {
-            num += 0;
-        } else {
-            num += (c - '0');
-        }
-        return num;
-
-    }
-
-
+    
 }
